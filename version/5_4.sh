@@ -17,11 +17,13 @@ mv phpunit-old.phar $HOME/.phpenv/versions/5.4/bin/phpunit
 echo "============ Installing Composer ============"
 curl -s http://getcomposer.org/installer | php
 chmod +x composer.phar
+mkdir -p $HOME/.phpenv/versions/5.4/bin
 mv composer.phar $HOME/.phpenv/versions/5.4/bin/composer
 
 #install pickle
 cd /tmp/pickle
-$HOME/.phpenv/versions/5.4/bin/composer install
+#phpuser should have permissions over phpenv directory
+gosu phpuser $HOME/.phpenv/versions/5.4/bin/composer install
 
 # Install php extensions
 echo "=========== Installing PHP extensions =============="

@@ -1,15 +1,23 @@
 #!/bin/bash -e
 
-sudo apt-get clean
-sudo mv /var/lib/apt/lists/* /tmp
-sudo mkdir -p /var/lib/apt/lists/partial
-sudo apt-get clean
+apt-get clean
+mv /var/lib/apt/lists/* /tmp
+mkdir -p /var/lib/apt/lists/partial
+apt-get clean
+
+#create a separate user for running php compose wihtout root
+#needs gosu installed in the u16all base image
+groupadd phpuser
+useradd -g phpuser phpuser
 
 # Install dependencies
 echo "=========== Installing dependencies ============"
+apt-get purge `dpkg -l | grep php| awk '{print $2}' |tr "\n" " "`
+sudo add-apt-repository -y ppa:ondrej/php
+
 apt-get update
 apt-get install -y git wget cmake libmcrypt-dev libreadline-dev libzmq-dev
-apt-get install libxml2-dev     \
+apt-get install -y libxml2-dev     \
                 libjpeg-dev     \
                 libpng-dev      \
                 libtidy-dev     \
@@ -18,11 +26,10 @@ apt-get install libxml2-dev     \
                 libbz2-dev      \
                 libcurl4-openssl-dev    \
                 libminiupnpc-dev\
-                libdb5.1-dev    \
+                libdb5.3-dev    \
                 libpng12-dev    \
                 libxpm-dev      \
                 libfreetype6-dev        \
-                libt1-dev       \
                 libgd2-xpm-dev  \
                 libgmp-dev      \
                 libsasl2-dev    \
@@ -33,15 +40,8 @@ apt-get install libxml2-dev     \
                 libsnmp-dev     \
                 libxslt1-dev    \
                 libmcrypt-dev
-apt-get install php5-dev
-
-# Install libmemcached
-echo "========== Installing libmemcached =========="
-wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
-tar xzf libmemcached-1.0.18.tar.gz && cd libmemcached-1.0.18
-./configure --enable-sasl
-make && make install
-cd .. && rm -fr libmemcached-1.0.18*
+                #libt1-dev       \
+apt-get install -y php5.6-dev
 
 # Install phpenv
 echo "============ Installing phpenv ============="
@@ -66,22 +66,9 @@ eval "$(phpenv init -)"
 git clone https://github.com/FriendsOfPHP/pickle.git /tmp/pickle
 ln -s /tmp/pickle/bin/pickle /usr/bin/
 
-# Install librabbitmq
-echo "============ Installing librabbitmq ============"
-cd /tmp && wget https://github.com/alanxz/rabbitmq-c/releases/download/v0.7.1/rabbitmq-c-0.7.1.tar.gz
-tar xzf rabbitmq-c-0.7.1.tar.gz
-mkdir build && cd build
-cmake /tmp/rabbitmq-c-0.7.1
-cmake -DCMAKE_INSTALL_PREFIX=/usr/local /tmp/rabbitmq-c-0.7.1
-cmake --build . --target install
-cd /tmp/rabbitmq-c-0.7.1
-autoreconf -i
-./configure
-make
-make install
 cd /
 
-for file in /u14phpall/version/*;
+for file in /u16phpall/version/*;
 do
   . $file
 done
