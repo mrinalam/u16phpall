@@ -13,9 +13,12 @@ useradd -g phpuser phpuser
 # Install dependencies
 echo "=========== Installing dependencies ============"
 apt-get purge `dpkg -l | grep php| awk '{print $2}' |tr "\n" " "`
-sudo add-apt-repository -y ppa:ondrej/php
+add-apt-repository -y ppa:ondrej/php
 
 apt-get update
+apt-get install php5.6
+apt-get install php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-xml
+
 apt-get install -y git wget cmake libmcrypt-dev libreadline-dev libzmq-dev
 apt-get install -y libxml2-dev     \
                 libjpeg-dev     \
@@ -67,11 +70,12 @@ git clone https://github.com/FriendsOfPHP/pickle.git /tmp/pickle
 ln -s /tmp/pickle/bin/pickle /usr/bin/
 
 cd /
+/u16phpall/version/5_4.sh
 
-for file in /u16phpall/version/*;
-do
-  . $file
-done
+#for file in /u16phpall/version/*;
+#do
+#  . $file
+#done
 
 # Cleaning package lists
 echo "================= Cleaning package lists ==================="

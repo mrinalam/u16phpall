@@ -1,3 +1,5 @@
+#!/bin/bash -e
+
 # Build PHP 5.4.39
 echo "============ Building PHP 5.4 =============="
 php-build -i development 5.4.39 $HOME/.phpenv/versions/5.4
@@ -6,6 +8,8 @@ php-build -i development 5.4.39 $HOME/.phpenv/versions/5.4
 echo "============ Setting phpenv to 5.4 ============"
 phpenv rehash
 phpenv global 5.4
+
+mkdir -p $HOME/.phpenv/versions/5.4/bin
 
 # Install phpunit
 echo "============ Installing PHPUnit ============="
@@ -17,7 +21,6 @@ mv phpunit-old.phar $HOME/.phpenv/versions/5.4/bin/phpunit
 echo "============ Installing Composer ============"
 curl -s http://getcomposer.org/installer | php
 chmod +x composer.phar
-mkdir -p $HOME/.phpenv/versions/5.4/bin
 mv composer.phar $HOME/.phpenv/versions/5.4/bin/composer
 
 #install pickle
