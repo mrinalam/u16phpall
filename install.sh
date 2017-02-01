@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash 
 
 apt-get clean
 mv /var/lib/apt/lists/* /tmp
@@ -53,8 +53,9 @@ echo "================= Installing GoSu ==================="
 
 #create a separate user for running php compose wihtout root
 #needs gosu installed in the u16all base image
-groupadd phpuser
-useradd -g phpuser phpuser
+useradd phpuser
+echo 'phpuser  ALL=(ALL:ALL) ALL' >> /etc/sudoers
+echo 'phpuser  ALL=(ALL) NOPASSWD: /home/phpuser/php-build/install.sh' >> /etc/sudoers
 chown -R phpuser /u16phpall/version
 chown phpuser /u16phpall/_install.sh
 mkdir /home/phpuser
@@ -62,7 +63,22 @@ chown -R phpuser /home/phpuser
 
 #add php user to sudo group
 usermod -aG sudo phpuser
+# Edit sudoers file # To avoid error: sudo: sorry, you must have a tty to run sudo 
+sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoers
 
+
+# Install php-build
+echo "============ Installing php-build =============="
+git clone git://github.com/php-build/php-build.git $HOME/php-build
+sudo $HOME/php-build/install.sh
+rm -rf $HOME/php-build
+
+#Download pickle
+git clone https://github.com/FriendsOfPHP/pickle.git /tmp/pickle
+sudo ln -s /tmp/pickle/bin/pickle /usr/bin/
+
+#let phpuser own the pickle
+chown -R phpuser /tmp/pickle
 #run remaining scripts by droppping root privileges as a phpuser
 echo "================= Installing phpversions as phpuser ==================="
 gosu phpuser /u16phpall/_install.sh

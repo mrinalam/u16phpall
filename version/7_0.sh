@@ -8,6 +8,7 @@ php-build -i development 7.0.1 $HOME/.phpenv/versions/7.0
 echo "============ Setting phpenv to 7.0 ============"
 phpenv rehash
 phpenv global 7.0
+cd /home/phpuser
 
 # Install phpunit
 echo "============ Installing PHPUnit ============="

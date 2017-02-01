@@ -28,7 +28,7 @@ mv composer.phar $HOME/.phpenv/versions/5.4/bin/composer
 #install pickle
 cd /tmp/pickle
 #phpuser should have permissions over phpenv directory
-gosu phpuser $HOME/.phpenv/versions/5.4/bin/composer install
+$HOME/.phpenv/versions/5.4/bin/composer install
 
 # Install php extensions
 echo "=========== Installing PHP extensions =============="
