@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash 
 
 # Build PHP 5.4.39
 echo "============ Building PHP 5.4 =============="
@@ -10,6 +10,8 @@ phpenv rehash
 phpenv global 5.4
 
 mkdir -p $HOME/.phpenv/versions/5.4/bin
+
+cd /home/phpuser
 
 # Install phpunit
 echo "============ Installing PHPUnit ============="

@@ -5,10 +5,6 @@ mv /var/lib/apt/lists/* /tmp
 mkdir -p /var/lib/apt/lists/partial
 apt-get clean
 
-#create a separate user for running php compose wihtout root
-#needs gosu installed in the u16all base image
-groupadd phpuser
-useradd -g phpuser phpuser
 
 # Install dependencies
 echo "=========== Installing dependencies ============"
@@ -46,36 +42,30 @@ apt-get install -y libxml2-dev     \
                 #libt1-dev       \
 apt-get install -y php5.6-dev
 
-# Install phpenv
-echo "============ Installing phpenv ============="
-git clone git://github.com/CHH/phpenv.git $HOME/phpenv
-$HOME/phpenv/bin/phpenv-install.sh
-echo 'export PATH=$HOME/.phpenv/bin:$PATH' >> $HOME/.bashrc
-echo 'eval "$(phpenv init -)"' >> $HOME/.bashrc
-rm -rf $HOME/phpenv
+#fixes for ubuntu 16.04. create soft links
+ln -s /usr/include/tidy/tidybuffio.h /usr/include/tidy/buffio.h
+ln -s /usr/include/tidy/tidyplatform.h /usr/include/tidy/platform.h
 
-# Install php-build
-echo "============ Installing php-build =============="
-git clone git://github.com/php-build/php-build.git $HOME/php-build
-$HOME/php-build/install.sh
-rm -rf $HOME/php-build
 
-# Activate phpenv
-export PATH=$HOME/.phpenv/bin:$PATH
-echo " 51 PATH=$HOME/.phpenv/bin:$PATH"
-eval "$(phpenv init -)"
+#install gosu
+echo "================= Installing GoSu ==================="
+/u16phpall/install_gosu.sh
 
-#Download pickle
-git clone https://github.com/FriendsOfPHP/pickle.git /tmp/pickle
-ln -s /tmp/pickle/bin/pickle /usr/bin/
+#create a separate user for running php compose wihtout root
+#needs gosu installed in the u16all base image
+groupadd phpuser
+useradd -g phpuser phpuser
+chown -R phpuser /u16phpall/version
+chown phpuser /u16phpall/_install.sh
+mkdir /home/phpuser
+chown -R phpuser /home/phpuser
 
-cd /
-/u16phpall/version/5_4.sh
+#add php user to sudo group
+usermod -aG sudo phpuser
 
-#for file in /u16phpall/version/*;
-#do
-#  . $file
-#done
+#run remaining scripts by droppping root privileges as a phpuser
+echo "================= Installing phpversions as phpuser ==================="
+gosu phpuser /u16phpall/_install.sh
 
 # Cleaning package lists
 echo "================= Cleaning package lists ==================="
